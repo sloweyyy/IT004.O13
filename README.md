@@ -12,7 +12,7 @@
 * **Tên môn học:** Cơ sở dữ liệu
 * **Mã môn học:** IT004
 * **Mã lớp:** IT004.O13
-* **Năm học:** HK2 (2020 - 2021)
+* **Năm học:** HK1 (2023-2024)
 * **GV Lý Thuyết**: Dương Phi Long - *longdp@uit.edu.vn*
 * **GV HDTH**: Lý Trần Thanh Thảo - *19520962@ms.uit.edu.vn*
 <!-- Footer -->
