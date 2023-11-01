@@ -1,0 +1,38 @@
+USE quanlybanhang
+-- Data Definition Language
+
+-- [1]
+-- [2]
+ALTER TABLE SANPHAM ADD GHICHU VARCHAR(20);
+
+-- [3]
+ALTER TABLE KHACHHANG ADD LOAIKH TINYINT;
+
+--[4]
+ALTER TABLE SANPHAM ALTER COLUMN GHICHU VARCHAR(100);
+
+-- [5]
+ALTER TABLE SANPHAM DROP COLUMN GHICHU;
+
+-- [6]
+ALTER TABLE KHACHHANG ALTER COLUMN LOAIKH VARCHAR(50);
+
+-- [7]
+ALTER TABLE SANPHAM
+ADD CONSTRAINT CHECK_DVT CHECK (DVT = 'CAY'
+                                OR DVT = 'CAI'
+                                OR DVT = 'HOP'
+                                OR DVT = 'QUYEN'
+                                OR DVT = 'CHUC'
+                               );
+
+-- [8]
+ALTER TABLE SANPHAM ADD CONSTRAINT CHECK_GIA CHECK (GIA >= 500);
+
+-- [9]
+ALTER TABLE HOADON ADD CONSTRAINT CHECK_MUAHANG CHECK (TRIGIA >= 1);
+
+-- [10]
+ALTER TABLE KHACHHANG ADD CONSTRAINT CHECK_NGDK CHECK (NGDK > NGSINH);
+
+-- [11]
