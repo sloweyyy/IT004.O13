@@ -1,84 +1,6 @@
-USE quanlybanhang;
+USE quanlybanhang
 
--- [12]
-SELECT SOHD
-FROM CTHD
-WHERE (
-          MASP = 'BB01'
-          OR MASP = 'BB02'
-      )
-      AND SL
-      BETWEEN 10 AND 20;
 
--- [13]
-SELECT SOHD
-FROM CTHD
-WHERE SL
-      BETWEEN 10 AND 20
-      AND MASP = 'BB01'
-      AND SOHD IN
-          (
-              SELECT SOHD FROM CTHD WHERE MASP = 'BB02'
-          );
-
--- [14]
-SELECT MASP,
-       TENSP
-FROM dbo.SANPHAM S
-WHERE NUOCSX = 'Trung Quoc'
-UNION
-SELECT S.MASP,
-       S.TENSP
-FROM dbo.SANPHAM S
-    INNER JOIN dbo.CTHD C
-        ON C.MASP = S.MASP
-    INNER JOIN dbo.HOADON H
-        ON C.SOHD = H.SOHD
-WHERE H.NGHD = '1/1/2007';
-
--- [15]
-SELECT S.MASP,
-       S.TENSP
-FROM dbo.SANPHAM S
-WHERE NOT EXISTS
-(
-    SELECT * FROM dbo.CTHD C WHERE S.MASP = C.MASP
-);
-
--- [16]
-SELECT MASP,
-       TENSP
-FROM dbo.SANPHAM
-WHERE MASP IN
-      (
-          SELECT MASP
-          FROM dbo.SANPHAM
-          EXCEPT
-          (SELECT MASP
-           FROM dbo.CTHD
-           WHERE SOHD IN
-                 (
-                     SELECT SOHD FROM dbo.HOADON WHERE YEAR(NGHD) = 2006
-                 ))
-      );
-
--- [17]
-SELECT MASP,
-       TENSP
-FROM dbo.SANPHAM
-WHERE NUOCSX = 'Trung Quoc'
-      AND MASP IN
-          (
-              SELECT MASP
-              FROM dbo.SANPHAM
-              EXCEPT
-              (SELECT MASP
-               FROM dbo.CTHD
-               WHERE SOHD IN
-                     (
-                         SELECT SOHD FROM dbo.HOADON WHERE YEAR(NGHD) = 2006
-                     ))
-          );
 
 -- [18.1]
 SELECT DISTINCT
@@ -176,46 +98,26 @@ WHERE NOT EXISTS
     )
 );
 
--- [20]
-SELECT COUNT(SOHD)
-FROM dbo.HOADON
-WHERE MAKH IS NULL;
-
--- [21]
-SELECT COUNT(DISTINCT (C.MASP)) AS SOSANPHAM
-FROM dbo.CTHD C
-    INNER JOIN dbo.HOADON H
-        ON H.SOHD = C.SOHD
-WHERE YEAR(H.NGHD) = 2006;
-
--- [22]
-SELECT MAX(TRIGIA) AS CAONHAT,
-       MIN(TRIGIA) AS THAPNHAT
-FROM dbo.HOADON;
-
--- [23]
-SELECT AVG(TRIGIA) AS TRUNGBINH
-FROM dbo.HOADON
-WHERE YEAR(NGHD) = 2006;
-
--- [24]
-SELECT SUM(TRIGIA)
-FROM dbo.HOADON
-WHERE YEAR(NGHD) = 2006;
-
 -- [25]
 SELECT TOP 1
        SOHD
 FROM dbo.HOADON
+WHERE YEAR(NGHD) = 2006
 ORDER BY TRIGIA DESC;
+
 
 -- [26]
 SELECT HOTEN
 FROM dbo.KHACHHANG
 WHERE MAKH =
 (
-    SELECT TOP 1 H.MAKH FROM dbo.HOADON H ORDER BY H.TRIGIA DESC
+    SELECT TOP 1
+           MAKH
+    FROM dbo.HOADON
+    WHERE YEAR(NGHD) = 2006
+    ORDER BY TRIGIA DESC
 );
+
 
 -- [27]
 SELECT TOP 3
@@ -225,32 +127,39 @@ FROM dbo.KHACHHANG
 ORDER BY DOANHSO DESC;
 
 
+
 -- [28]
-SELECT TOP 1 WITH TIES
+SELECT TOP 3 WITH TIES
        MASP,
-       TENSP
+       TENSP,
+       GIA
 FROM dbo.SANPHAM
 ORDER BY GIA DESC;
 
 -- [29]
-SELECT TOP 1 WITH TIES
-       MASP,
+SELECT MASP,
        TENSP
 FROM dbo.SANPHAM
 WHERE NUOCSX = 'Thai Lan'
-ORDER BY GIA DESC;
+      AND GIA IN
+          (
+              SELECT TOP 3 GIA FROM dbo.SANPHAM ORDER BY GIA DESC
+          );
 
 -- [30]
-SELECT TOP 1
-       MASP,
+SELECT MASP,
        TENSP
 FROM dbo.SANPHAM
 WHERE NUOCSX = 'Trung Quoc'
-      AND MASP IN
+      AND GIA IN
           (
-              SELECT MASP FROM dbo.SANPHAM WHERE NUOCSX = 'Trung Quoc'
-          )
-ORDER BY GIA DESC;
+              SELECT TOP 3
+                     GIA
+              FROM dbo.SANPHAM
+              WHERE NUOCSX = 'Trung Quoc'
+              ORDER BY GIA DESC
+          );
+
 
 -- [31]
 SELECT TOP 3 WITH TIES
@@ -370,12 +279,16 @@ HAVING COUNT(DISTINCT GIA) >= 3;
 
 -- [45]
 SELECT TOP 1
-       K.MAKH
+       K.MAKH,
+       K.HOTEN,
+       COUNT(H.SOHD) AS SL
 FROM dbo.KHACHHANG K
     INNER JOIN dbo.HOADON H
         ON H.MAKH = K.MAKH
 WHERE K.MAKH IN
       (
           SELECT TOP 10 MAKH FROM dbo.KHACHHANG ORDER BY DOANHSO DESC
-      );
-
+      )
+GROUP BY K.MAKH,
+         K.HOTEN
+ORDER BY SL DESC;
